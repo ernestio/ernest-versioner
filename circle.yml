@@ -1,0 +1,7 @@
+dependencies:
+  override:
+    - make deps && make install
+
+test:
+  override:
+    - make test
