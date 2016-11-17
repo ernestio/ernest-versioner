@@ -127,7 +127,7 @@ class MyCLI < Thor
 
     def release_notes(github, number)
       @notes = ''
-      @issue_types = { 'bug' => 'Bugs', 'new feature' => 'New features', 'improvement' => 'Improvements' }
+      @issue_types = { 'new feature' => 'New features', 'bug' => 'Bugs', 'improvement' => 'Improvements' }
 
       @issue_types.each_with_index do |t, title|
         @notes += "\n\n #{title}"
