@@ -10,18 +10,15 @@ require 'atlas'
 
 # CLI to release versions
 class MyCLI < Thor
+  desc 'notes NUMBER', 'Prints release notes for a specific version'
+  def notes(number)
+    @github = github_client
+    puts release_notes(@github, number)
+  end
+
   desc 'version NUMBER FILE', 'Will bump a version for the given repos'
   def version(number, file)
-    @github_token = ENV['GITHUB_TOKEN']
-    if @github_token.nil?
-      puts 'Please define a GITHUB_TOKEN environment variable on your system before running this command'
-      @github_token = ask 'A Github token is needed to perform the release please introduce yours : '
-      if @github_token == ''
-        puts 'Github token is required you can provide it with this inline tool or by using GITHUB_TOKEN environment variable'
-        return
-      end
-    end
-    @github = Octokit::Client.new(access_token: @github_token)
+    @github = github_client
 
     @slack_url = ENV['SLACK_WEBHOOK_URL']
     if @slack_url.nil?
@@ -101,6 +98,20 @@ class MyCLI < Thor
   end
 
   no_commands do
+    def github_client
+
+      @github_token = ENV['GITHUB_TOKEN']
+      if @github_token.nil?
+        puts 'Please define a GITHUB_TOKEN environment variable on your system before running this command'
+        @github_token = ask 'A Github token is needed to perform the release please introduce yours : '
+        if @github_token == ''
+          puts 'Github token is required you can provide it with this inline tool or by using GITHUB_TOKEN environment variable'
+          return
+        end
+      end
+      Octokit::Client.new(access_token: @github_token)
+    end
+
     def verified?(file)
       e! 'rm -rf /tmp/verify 2 > /dev/null'
       e! 'mkdir -p /tmp/verify'
@@ -129,7 +140,7 @@ class MyCLI < Thor
       @notes = ''
       @issue_types = { 'new feature' => 'New features', 'bug' => 'Bugs', 'improvement' => 'Improvements' }
 
-      @issue_types.each_with_index do |t, title|
+      @issue_types.each do |t, title|
         @notes += "\n\n #{title}"
         @notes += "\n--------------------"
         @notes += "\n" + issue_type_summary(github, number, t)
