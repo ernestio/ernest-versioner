@@ -193,7 +193,7 @@ class MyCLI < Thor
       e! 'cd /tmp/ernest-vagrant && berks vendor cookbooks'
       e! 'cd /tmp/ernest-vagrant && vagrant up'
       e! 'cd /tmp/ernest-vagrant && vagrant package'
-      e! 'cd /tmp/ernest-vagrant && vagrant destroy'
+      e! 'cd /tmp/ernest-vagrant && vagrant destroy -f'
 
       box = Atlas::Box.find('R3Labs/ernest')
       version = box.create_version(version: number, description: title)
