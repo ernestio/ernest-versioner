@@ -190,7 +190,7 @@ class MyCLI < Thor
       e! "cd /tmp/ernest/ && git add docker-compose.yml && git commit -m 'Bump version #{number}' && git push origin master"
 
       @notes = release_notes github, number
-      github.create_release('ernest/ernest', number, name: title, body: @notes)
+      github.create_release('ernestio/ernest', number, name: title, body: @notes)
     end
 
     # Release vagrant box on Atlas
