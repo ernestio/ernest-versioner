@@ -78,7 +78,14 @@ class MyCLI < Thor
     msg = 'Docker release started, this may take a while'
     puts msg.blue
     @slack.ping msg unless @slack_url.empty?
-    docker_release(@github, number, release_title)
+
+    @docker_username = ENV['DOCKER_USERNAME']
+    @docker_username = ask 'Provide your docker hub username : ' if @docker_username.nil?
+
+    @docker_password = ENV['DOCKER_PASSWORD']
+    @docker_password = ask 'Provide your docker hub password : ' if @docker_password.nil?
+
+    docker_release(@github, number, release_title, @docker_username, @docker_password)
     msg = '... done'
     puts msg.green
     @slack.ping msg unless @slack_url.empty?
@@ -175,11 +182,11 @@ class MyCLI < Thor
     end
 
     # Docker compose release
-    def docker_release(github, number, title)
+    def docker_release(github, number, title, user, pass)
       e! 'rm -rf /tmp/composable && mkdir -p /tmp/composable'
       e! 'rm -rf /tmp/ernest'
       e! 'cd /tmp && git clone git@github.com:ernestio/ernest.git'
-      e! "cd /tmp/ernest/ && composable release -version #{number} -org ernestio definition.yml template.yml"
+      e! "cd /tmp/ernest/ && composable release -u #{user} -p #{pass} -version #{number} -org ernestio definition.yml template.yml"
       e! "cd /tmp/ernest/ && git add docker-compose.yml && git commit -m 'Bump version #{number}' && git push origin master"
 
       @notes = release_notes github, number
