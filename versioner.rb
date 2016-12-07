@@ -106,7 +106,6 @@ class MyCLI < Thor
 
   no_commands do
     def github_client
-
       @github_token = ENV['GITHUB_TOKEN']
       if @github_token.nil?
         puts 'Please define a GITHUB_TOKEN environment variable on your system before running this command'
@@ -123,13 +122,13 @@ class MyCLI < Thor
       e! 'rm -rf /tmp/verify 2 > /dev/null'
       e! 'mkdir -p /tmp/verify'
       e! "verify #{file}"
-      $?.success?
+      $CHILD_STATUS.success?
     end
 
     # Executes a command and checks the output
     def e!(command)
       `#{command}`
-      abort "Command '#{command}' finished with an errored satus" unless $?.success?
+      abort "Command '#{command}' finished with an errored satus" unless $CHILD_STATUS.success?
     end
 
     def bump_version(repo, number)
@@ -172,11 +171,11 @@ class MyCLI < Thor
       e! 'go get github.com/aktau/github-release'
       e! 'cd /tmp/ernest-cli/ && git checkout master && make dist'
       ["ernest-#{number}-darwin-386.zip",
-      "ernest-#{number}-darwin-amd64.zip",
-      "ernest-#{number}-linux-386.zip",
-      "ernest-#{number}-linux-amd64.zip",
-      "ernest-#{number}-windows-386.zip",
-      "ernest-#{number}-windows-amd64.zip"].each do |file_name|
+       "ernest-#{number}-darwin-amd64.zip",
+       "ernest-#{number}-linux-386.zip",
+       "ernest-#{number}-linux-amd64.zip",
+       "ernest-#{number}-windows-386.zip",
+       "ernest-#{number}-windows-amd64.zip"].each do |file_name|
         e! "cd /tmp/ernest-cli/ && github-release upload --user ernestio --repo ernest-cli --tag #{number} --name #{file_name} --file #{file_name}"
       end
     end
@@ -208,7 +207,6 @@ class MyCLI < Thor
       provider.upload(File.open('/tmp/ernest-vagrant/package.box'))
       version.release
     end
-
   end
 end
 
