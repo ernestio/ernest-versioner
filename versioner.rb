@@ -16,6 +16,12 @@ class MyCLI < Thor
     puts release_notes(@github, number)
   end
 
+  desc 'checkci FILE', 'Check all repos ci for develop branch'
+  def checkci(file)
+    check_ci_builds File.readlines(file)
+  end
+
+
   desc 'version NUMBER FILE', 'Will bump a version for the given repos'
   def version(number, file)
     @github = github_client
@@ -36,6 +42,10 @@ class MyCLI < Thor
     puts 'In order to fully automate your release process we need you to provide some extra info'
     release_title = ask('Release title : ')
     @slack.ping "Starting release #{number}" unless @slack_url.empty?
+
+    if check_ci_builds(File.readlines(file), @slack, @slack_url) == false 
+      return
+    end
 
     # Integrity verification
     msg = "Verifying if develop and master branch haven't diverged"
@@ -105,6 +115,30 @@ class MyCLI < Thor
   end
 
   no_commands do
+    def check_ci_builds(lines, slack = nil, slack_url = "")
+      msg = "Checking ernestio CIs"
+      puts msg.blue
+      slack.ping msg unless slack_url.empty?
+      lines.map do |line|
+        repo_name = line.slice((line.index(':')+1)..(line.index('.git')-1))
+        url = "https://circleci.com/api/v1.1/project/github/#{repo_name}/tree/develop"
+        resp = Net::HTTP.get_response(URI.parse(url))
+        result = JSON.parse(resp.body)
+        if not result[0]['failed'].nil?
+          msg = "Aborting due to a broken build for #{repo_name} : #{result[0]['build_url']}"
+          puts ""
+          puts msg.red
+          slack.ping msg unless slack_url.empty?
+          return false
+        end
+        putc '.'
+      end
+      msg = '... done'
+      puts msg.green
+      slack.ping msg unless slack_url.empty?
+      return true
+    end
+
     def github_client
       @github_token = ENV['GITHUB_TOKEN']
       if @github_token.nil?
