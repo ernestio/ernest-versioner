@@ -1,0 +1,5 @@
+require 'lib/versioner'
+require 'slack-ruby-bot'
+require 'ernest-bot/commands/notes'
+require 'ernest-bot/commands/ci'
+require 'ernest-bot/bot'

@@ -7,6 +7,7 @@ require 'colorize'
 require 'octokit'
 require 'slack-notifier'
 require 'atlas'
+require_relative 'lib/versioner'
 
 # CLI to release versions
 class MyCLI < Thor
@@ -20,7 +21,6 @@ class MyCLI < Thor
   def checkci(file)
     check_ci_builds File.readlines(file)
   end
-
 
   desc 'version NUMBER FILE', 'Will bump a version for the given repos'
   def version(number, file)
@@ -43,9 +43,7 @@ class MyCLI < Thor
     release_title = ask('Release title : ')
     @slack.ping "Starting release #{number}" unless @slack_url.empty?
 
-    if check_ci_builds(File.readlines(file), @slack, @slack_url) == false 
-      return
-    end
+    return if check_ci_builds(File.readlines(file), @slack, @slack_url) == false
 
     # Integrity verification
     msg = "Verifying if develop and master branch haven't diverged"
@@ -115,132 +113,6 @@ class MyCLI < Thor
   end
 
   no_commands do
-    def check_ci_builds(lines, slack = nil, slack_url = "")
-      msg = "Checking ernestio CIs"
-      puts msg.blue
-      slack.ping msg unless slack_url.empty?
-      lines.map do |line|
-        repo_name = line.slice((line.index(':')+1)..(line.index('.git')-1))
-        url = "https://circleci.com/api/v1.1/project/github/#{repo_name}/tree/develop"
-        resp = Net::HTTP.get_response(URI.parse(url))
-        result = JSON.parse(resp.body)
-        if not result[0]['failed'].nil?
-          msg = "Aborting due to a broken build for #{repo_name} : #{result[0]['build_url']}"
-          puts ""
-          puts msg.red
-          slack.ping msg unless slack_url.empty?
-          return false
-        end
-        putc '.'
-      end
-      msg = '... done'
-      puts msg.green
-      slack.ping msg unless slack_url.empty?
-      return true
-    end
-
-    def github_client
-      @github_token = ENV['GITHUB_TOKEN']
-      if @github_token.nil?
-        puts 'Please define a GITHUB_TOKEN environment variable on your system before running this command'
-        @github_token = ask 'A Github token is needed to perform the release please introduce yours : '
-        if @github_token == ''
-          puts 'Github token is required you can provide it with this inline tool or by using GITHUB_TOKEN environment variable'
-          return
-        end
-      end
-      Octokit::Client.new(access_token: @github_token)
-    end
-
-    def verified?(file)
-      e! 'rm -rf /tmp/verify 2 > /dev/null'
-      e! 'mkdir -p /tmp/verify'
-      e! "verify #{file}"
-      $CHILD_STATUS.success?
-    end
-
-    # Executes a command and checks the output
-    def e!(command)
-      `#{command}`
-      abort "Command '#{command}' finished with an errored satus" unless $CHILD_STATUS.success?
-    end
-
-    def bump_version(repo, number)
-      e! 'mkdir -p tmp'
-      e! "rm -rf tmp && git clone #{repo} tmp"
-      e! 'cd tmp && git checkout develop'
-      e! "cd tmp && echo #{number} > VERSION && git add . && git commit -m 'Bump version #{number}' && git push origin develop"
-      e! 'cd tmp && git fetch && git checkout master'
-      e! 'cd tmp && git merge --no-edit develop'
-      e! "cd tmp && git tag -a #{number} -m 'Bump version #{number}'"
-      e! 'cd tmp && git push origin master --tags'
-    end
-
-    def release_notes(github, number)
-      @notes = ''
-      @issue_types = { 'new feature' => 'New features', 'bug' => 'Bugs', 'improvement' => 'Improvements' }
-
-      @issue_types.each do |t, title|
-        @notes += "\n\n #{title}"
-        @notes += "\n--------------------"
-        @notes += "\n" + issue_type_summary(github, number, t)
-      end
-      @notes
-    end
-
-    def issue_type_summary(github, number, type)
-      @list = ''
-      issues = github.issues 'ernestio/ernest', per_page: 100, labels: "#{number},#{type}", state: 'closed'
-      issues.each do |i|
-        @list += "\n#{i.title} [#{i.id}](#{i.url})"
-      end
-      @list
-    end
-
-    # Creates an ernest-cli release
-    def release_cli(github, number, title)
-      github.create_release('ernestio/ernest-cli', number, name: title, body: "Bump version #{number}")
-      e! 'rm -rf /tmp/ernest-cli && cd /tmp/'
-      e! 'cd /tmp && git clone git@github.com:ernestio/ernest-cli'
-      e! 'go get github.com/aktau/github-release'
-      e! 'cd /tmp/ernest-cli/ && git checkout master && make dist'
-      ["ernest-#{number}-darwin-386.zip",
-       "ernest-#{number}-darwin-amd64.zip",
-       "ernest-#{number}-linux-386.zip",
-       "ernest-#{number}-linux-amd64.zip",
-       "ernest-#{number}-windows-386.zip",
-       "ernest-#{number}-windows-amd64.zip"].each do |file_name|
-        e! "cd /tmp/ernest-cli/ && github-release upload --user ernestio --repo ernest-cli --tag #{number} --name #{file_name} --file #{file_name}"
-      end
-    end
-
-    # Docker compose release
-    def docker_release(github, number, title, user, pass)
-      e! 'rm -rf /tmp/composable && mkdir -p /tmp/composable'
-      e! 'rm -rf /tmp/ernest'
-      e! 'cd /tmp && git clone git@github.com:ernestio/ernest.git'
-      e! "cd /tmp/ernest/ && composable release -E ERNEST_CRYPTO_KEY=CRYPTO_KEY_TEMPLATE -u #{user} -p #{pass} -version #{number} -org ernestio definition.yml template.yml"
-      e! "cd /tmp/ernest/ && git add docker-compose.yml && git commit -m 'Bump version #{number}' && git push origin master"
-
-      @notes = release_notes github, number
-      github.create_release('ernestio/ernest', number, name: title, body: @notes)
-    end
-
-    # Release vagrant box on Atlas
-    def vagrant_artifacts(number, title)
-      e! 'cd /tmp && git clone git@github.com:ernestio/ernest-vagrant.git'
-      e! 'cd /tmp/ernest-vagrant && git checkout develop'
-      e! 'cd /tmp/ernest-vagrant && berks vendor cookbooks'
-      e! 'cd /tmp/ernest-vagrant && vagrant up'
-      e! 'cd /tmp/ernest-vagrant && vagrant package'
-      e! 'cd /tmp/ernest-vagrant && vagrant destroy -f'
-
-      box = Atlas::Box.find('R3Labs/ernest')
-      version = box.create_version(version: number, description: title)
-      provider = version.create_provider(name: 'virtualbox')
-      provider.upload(File.open('/tmp/ernest-vagrant/package.box'))
-      version.release
-    end
   end
 end
 
