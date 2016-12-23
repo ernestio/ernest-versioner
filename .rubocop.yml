@@ -15,3 +15,6 @@ Metrics/PerceivedComplexity:
 
 Metrics/CyclomaticComplexity:
   Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: false

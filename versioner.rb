@@ -42,7 +42,6 @@ class MyCLI < Thor
     puts 'In order to fully automate your release process we need you to provide some extra info'
     release_title = ask('Release title : ')
     @slack.ping "Starting release #{number}" unless @slack_url.empty?
-
     return if check_ci_builds(File.readlines(file), @slack, @slack_url) == false
 
     # Integrity verification

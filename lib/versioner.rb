@@ -46,13 +46,13 @@ def verified?(file)
   e! 'rm -rf /tmp/verify 2 > /dev/null'
   e! 'mkdir -p /tmp/verify'
   e! "verify #{file}"
-  $CHILD_STATUS.success?
+  $?.success?
 end
 
 # Executes a command and checks the output
 def e!(command)
   `#{command}`
-  abort "Command '#{command}' finished with an errored satus" unless $CHILD_STATUS.success?
+  abort "Command '#{command}' finished with an errored satus" unless $?.success?
 end
 
 def bump_version(repo, number)
@@ -90,17 +90,18 @@ end
 # Creates an ernest-cli release
 def release_cli(github, number, title)
   github.create_release('ernestio/ernest-cli', number, name: title, body: "Bump version #{number}")
-  e! 'rm -rf /tmp/ernest-cli && cd /tmp/'
-  e! 'cd /tmp && git clone git@github.com:ernestio/ernest-cli'
+  path = "#{ENV['GOPATH']}/src/github.com/ernestio/"
+  e! "rm -rf #{path}ernest-cli && cd /tmp/"
+  e! "cd #{path}ernest-cli  && git clone git@github.com:ernestio/ernest-cli"
   e! 'go get github.com/aktau/github-release'
-  e! 'cd /tmp/ernest-cli/ && git checkout master && make dist'
+  e! "cd #{path}ernest-cli/ && git checkout master && make dist"
   ["ernest-#{number}-darwin-386.zip",
    "ernest-#{number}-darwin-amd64.zip",
    "ernest-#{number}-linux-386.zip",
    "ernest-#{number}-linux-amd64.zip",
    "ernest-#{number}-windows-386.zip",
    "ernest-#{number}-windows-amd64.zip"].each do |file_name|
-    e! "cd /tmp/ernest-cli/ && github-release upload --user ernestio --repo ernest-cli --tag #{number} --name #{file_name} --file #{file_name}"
+    e! "cd #{path}ernest-cli/ && github-release upload --user ernestio --repo ernest-cli --tag #{number} --name #{file_name} --file #{file_name}"
   end
 end
 
