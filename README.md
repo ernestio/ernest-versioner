@@ -1,8 +1,8 @@
-# Ernest-versioner 
+# Ernest-versioner
 
 _master: [![CircleCI Master](https://circleci.com/gh/ernestio/ernest-versioner/tree/master.svg?style=svg)](https://circleci.com/gh/ernestio/ernest-versioner/tree/master) | develop: [![CircleCI Develop](https://circleci.com/gh/ernestio/ernest-versioner/tree/develop.svg?style=svg)](https://circleci.com/gh/ernestio/ernest-versioner/tree/develop)_
 
-This software intends to be an automation on the ernest release process. 
+This software intends to be an automation on the ernest release process.
 It will follow the next steps in order to completely release ernest.
 
 - [x] For each repo will verify if develop and master branches have diverged
@@ -23,6 +23,11 @@ Before running the script you need to be sure all the repos you want to version 
 Once you're sure these repos are correct, you only need to run the script as follows:
 
 ```
+$ git clone git@github.com:ernestio/ernest-versioner
+$ docker run -it ernestio/ernest-versioner:latest
+# verify the repo list is correct
+cat ernest-repositories-list.txt
+# NB: please add your ssh key to the container before starting the release
 $ ruby versioner.rb version NUMBER FILE
 ```
 
