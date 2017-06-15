@@ -14,3 +14,4 @@ git@github.com:ernestio/myst.git
 git@github.com:ernestio/all-all-fake-connector.git
 git@github.com:ernestio/all-all-aws-connector.git
 git@github.com:ernestio/all-all-vcloud-connector.git
+git@github.com:ernestio/all-all-azure-connector.git
