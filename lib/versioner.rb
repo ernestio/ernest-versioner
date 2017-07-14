@@ -7,6 +7,7 @@ def check_ci_builds(lines, slack = nil, slack_url = '', say = nil)
   puts msg.blue
   slack.ping msg unless slack_url.empty?
   say.call(msg) unless say.nil?
+  failed_builds = []
   lines.map do |line|
     repo_name = line.slice((line.index(':') + 1)..(line.index('.git') - 1))
     url = "https://circleci.com/api/v1.1/project/github/#{repo_name}/tree/develop"
@@ -16,12 +17,13 @@ def check_ci_builds(lines, slack = nil, slack_url = '', say = nil)
       msg = "Aborting due to a broken build for #{repo_name} : #{result[0]['build_url']}"
       puts ''
       puts msg.red
+      failed_builds << msg
       slack.ping msg unless slack_url.empty?
       say.call("#{msg} :boom:") unless say.nil?
-      return false
     end
     putc '.'
   end
+  return false unless failed_builds.empty?
   msg = 'All green!'
   puts msg.green
   slack.ping msg unless slack_url.empty?
