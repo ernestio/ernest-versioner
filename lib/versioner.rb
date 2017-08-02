@@ -73,9 +73,7 @@ def release_notes(github, number)
   @issue_types = { 'new feature' => 'New features', 'bug' => 'Bugs', 'improvement' => 'Improvements' }
 
   @issue_types.each do |t, title|
-    @notes += "\n\n #{title}"
-    @notes += "\n--------------------"
-    @notes += "\n" + issue_type_summary(github, number, t)
+    @notes += issue_type_summary(github, number, t)
   end
   @notes
 end
@@ -83,10 +81,13 @@ end
 def issue_type_summary(github, number, type)
   @list = ''
   issues = github.issues 'ernestio/ernest', per_page: 100, labels: "#{number},#{type}", state: 'closed'
+  return '' if (issues.length == 0)
   issues.each do |i|
     @list += "\n#{i.title} [#{i.id}](#{i.url})"
   end
-  @list
+  @notes += "\n\n #{title}"
+  @notes += "\n--------------------"
+  @notes += "\n" + @list
 end
 
 # Creates an ernest-cli release
