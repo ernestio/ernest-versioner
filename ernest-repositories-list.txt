@@ -3,10 +3,11 @@ git@github.com:ernestio/ernest-vagrant.git
 git@github.com:ernestio/definition-mapper.git
 git@github.com:ernestio/scheduler.git
 git@github.com:ernestio/api-gateway.git
-git@github.com:ernestio/group-store.git
 git@github.com:ernestio/service-store.git
 git@github.com:ernestio/config-store.git
 git@github.com:ernestio/user-store.git
+git@github.com:ernestio/authenticator.git
+git@github.com:ernestio/authorization-store.git
 git@github.com:ernestio/datacenter-store.git
 git@github.com:ernestio/ernest-cli.git
 git@github.com:ernestio/monit.git
