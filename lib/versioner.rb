@@ -73,12 +73,12 @@ def release_notes(github, number)
   @issue_types = { 'new feature' => 'New features', 'bug' => 'Bugs', 'improvement' => 'Improvements' }
 
   @issue_types.each do |t, title|
-    @notes += issue_type_summary(github, number, t)
+    @notes += issue_type_summary(github, number, t, title)
   end
   @notes
 end
 
-def issue_type_summary(github, number, type)
+def issue_type_summary(github, number, type, title)
   @list = ''
   issues = github.issues 'ernestio/ernest', per_page: 100, labels: "#{number},#{type}", state: 'closed'
   return '' if (issues.length == 0)
