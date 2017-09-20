@@ -81,7 +81,7 @@ end
 def issue_type_summary(github, number, type, title)
   @list = ''
   issues = github.issues 'ernestio/ernest', per_page: 100, labels: "#{number},#{type}", state: 'closed'
-  return '' if (issues.length == 0)
+  return '' if issues.empty?
   issues.each do |i|
     @list += "\n#{i.title} [#{i.id}](#{i.url})"
   end
@@ -116,7 +116,7 @@ def docker_release(github, number, title, user, pass)
   e! 'cd /tmp/ernest/ && git checkout develop'
   e! "cd /tmp/ernest/ && composable release -E ERNEST_CRYPTO_KEY=CRYPTO_KEY_TEMPLATE -u #{user} -p #{pass} -version #{number} -org ernestio definition.yml template.yml"
   e! "cd /tmp/ernest/ && git add docker-compose.yml && git commit -m 'Bump version #{number}' && git push origin develop"
-  e! "cd /tmp/ernest/ && git checkout master && git rebase develop && git push origin master"
+  e! 'cd /tmp/ernest/ && git checkout master && git rebase develop && git push origin master'
 
   @notes = release_notes github, number
   github.create_release('ernestio/ernest', number, name: title, body: @notes)
