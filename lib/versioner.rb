@@ -113,9 +113,10 @@ def docker_release(github, number, title, user, pass)
   e! 'rm -rf /tmp/composable && mkdir -p /tmp/composable'
   e! 'rm -rf /tmp/ernest'
   e! 'cd /tmp && git clone git@github.com:ernestio/ernest.git'
-  e! 'cd /tmp/ernest/ && git merge origin/develop'
+  e! 'cd /tmp/ernest/ && git checkout develop'
   e! "cd /tmp/ernest/ && composable release -E ERNEST_CRYPTO_KEY=CRYPTO_KEY_TEMPLATE -u #{user} -p #{pass} -version #{number} -org ernestio definition.yml template.yml"
-  e! "cd /tmp/ernest/ && git add docker-compose.yml && git commit -m 'Bump version #{number}' && git push origin master"
+  e! "cd /tmp/ernest/ && git add docker-compose.yml && git commit -m 'Bump version #{number}' && git push origin develop"
+  e! "cd /tmp/ernest/ && git checkout master && git rebase develop && git push origin master"
 
   @notes = release_notes github, number
   github.create_release('ernestio/ernest', number, name: title, body: @notes)
