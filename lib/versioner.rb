@@ -9,11 +9,12 @@ def check_ci_builds(lines, slack = nil, slack_url = '', say = nil)
   say.call(msg) unless say.nil?
   failed_builds = []
   lines.map do |line|
-    repo_name = line.slice((line.index(':') + 1)..(line.index('.git') - 1))
-    url = "https://circleci.com/api/v1.1/project/github/#{repo_name}/tree/develop"
+		ci_token = ENV['CI_TOKEN']
+		repo_name = line.split(/:|\./)[2]
+    url = "https://circleci.com/api/v1.1/project/github/#{repo_name}/tree/develop?circle-token=#{ci_token}"
     resp = Net::HTTP.get_response(URI.parse(url))
     result = JSON.parse(resp.body)
-    unless result[0]['failed'].nil?
+    if result[0]['failed']
       msg = "Aborting due to a broken build for #{repo_name} : #{result[0]['build_url']}"
       puts ''
       puts msg.red
@@ -54,7 +55,7 @@ end
 # Executes a command and checks the output
 def e!(command)
   `#{command}`
-  abort "Command '#{command}' finished with an errored satus" unless $?.success?
+  abort "Command '#{command}' finished with an errored status" unless $?.success?
 end
 
 def bump_version(repo, number)
@@ -116,7 +117,7 @@ def docker_release(github, number, title, user, pass)
   e! 'cd /tmp/ernest/ && git checkout develop'
   e! "cd /tmp/ernest/ && composable release -L quay.io -O r3labs -v #{number} -U #{user} -p #{pass} definition.yml template.yml"
   e! "cd /tmp/ernest/ && git add docker-compose.yml docker-compose.enterprise.yml && git commit -m 'Bump version #{number}' && git push origin develop"
-  e! 'cd /tmp/ernest/ && git checkout master && git rebase develop && git push origin master'
+  e! "cd /tmp/ernest/ && git checkout master && git rebase develop && git tag -a #{number} -m 'Bump version #{number}' && git push origin master --tags"
 
   @notes = release_notes github, number
   github.create_release('ernestio/ernest', number, name: title, body: @notes)

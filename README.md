@@ -40,6 +40,7 @@ $ ruby versioner.rb version 0.0.1 ernest-repositories-list.txt
 Additionally in case you want to skip some of the inline questions you can define the following environment variables:
 
 - *GITHUB_TOKEN* : In order to merge develop in master, push, create tags...
+- *CI_TOKEN* : In order to check the build status of each repository.
 - *SLACK_WEBHOOK_URL* : In case you want slack to be notifying each release step
 - *ATLAS_TOKEN* : In order to upload packaged vagrant boxes
 

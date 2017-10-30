@@ -97,15 +97,6 @@ class MyCLI < Thor
     puts msg.green
     @slack.ping msg unless @slack_url.empty?
 
-    # Upload vagrant artifacts
-    msg = 'Generating vagrant artifacts, this may take a while'
-    puts msg.blue
-    @slack.ping msg unless @slack_url.empty?
-    vagrant_artifacts(number, release_title)
-    msg = '... done'
-    puts msg.green
-    @slack.ping msg unless @slack_url.empty?
-
     msg = "Well done! While you were in the pub, I've released version number #{number}"
     puts msg.green
     @slack.ping "#{msg} :tada:!!" unless @slack_url.empty?
