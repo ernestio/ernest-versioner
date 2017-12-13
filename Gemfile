@@ -17,6 +17,7 @@ gem 'slack-ruby-bot'
 group :development, :test do
   gem 'foreman'
   gem 'rake'
+  gem 'pry'
 end
 
 group :test do

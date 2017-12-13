@@ -84,7 +84,7 @@ def issue_type_summary(github, number, type, title)
   issues = github.issues 'ernestio/ernest', per_page: 100, labels: "#{number},#{type}", state: 'closed'
   return '' if issues.empty?
   issues.each do |i|
-    @list += "\n#{i.title} [#{i.id}](#{i.url})"
+    @list += "\n#{i.title} [#{i.id}](#{i.html_url})"
   end
   @notes = "\n\n #{title}"
   @notes += "\n--------------------"
