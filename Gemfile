@@ -1,25 +1,25 @@
 # A sample Gemfile
 source 'https://rubygems.org'
 
-gem 'thor'
-gem 'rubocop'
-gem 'colorize'
-gem 'slack-notifier'
-gem 'octokit'
 gem 'atlas'
+gem 'colorize'
+gem 'octokit'
+gem 'rubocop'
+gem 'slack-notifier'
+gem 'thor'
 
-gem 'slack-ruby-bot'
+gem 'celluloid-io'
+gem 'dotenv'
 gem 'puma'
 gem 'sinatra'
-gem 'dotenv'
-gem 'celluloid-io'
+gem 'slack-ruby-bot'
 
 group :development, :test do
-  gem 'rake'
   gem 'foreman'
+  gem 'rake'
 end
 
 group :test do
-  gem 'rspec'
   gem 'rack-test'
+  gem 'rspec'
 end

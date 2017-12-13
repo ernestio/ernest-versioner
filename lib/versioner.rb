@@ -9,8 +9,8 @@ def check_ci_builds(lines, slack = nil, slack_url = '', say = nil)
   say.call(msg) unless say.nil?
   failed_builds = []
   lines.map do |line|
-		ci_token = ENV['CI_TOKEN']
-		repo_name = line.split(/:|\./)[2]
+    ci_token = ENV['CI_TOKEN']
+    repo_name = line.split(/:|\./)[2]
     url = "https://circleci.com/api/v1.1/project/github/#{repo_name}/tree/develop?circle-token=#{ci_token}"
     resp = Net::HTTP.get_response(URI.parse(url))
     result = JSON.parse(resp.body)
