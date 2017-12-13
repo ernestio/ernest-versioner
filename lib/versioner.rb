@@ -86,7 +86,7 @@ def issue_type_summary(github, number, type, title)
   issues.each do |i|
     @list += "\n#{i.title} [#{i.id}](#{i.url})"
   end
-  @notes += "\n\n #{title}"
+  @notes = "\n\n #{title}"
   @notes += "\n--------------------"
   @notes += "\n" + @list
 end
