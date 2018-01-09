@@ -20,3 +20,5 @@ git@github.com:ernestio/all-all-aws-connector.git
 git@github.com:ernestio/config-store.git
 git@github.com:ernestio/ernest-cli.git
 git@github.com:r3labs/mfa.git
+git@github.com:r3labs/policy-store.git
+git@github.com:r3labs/compliance.git
