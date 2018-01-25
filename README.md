@@ -1,8 +1,8 @@
-# Ernest-versioner 
+# Ernest-versioner
 
 _master: [![CircleCI Master](https://circleci.com/gh/ernestio/ernest-versioner/tree/master.svg?style=svg)](https://circleci.com/gh/ernestio/ernest-versioner/tree/master) | develop: [![CircleCI Develop](https://circleci.com/gh/ernestio/ernest-versioner/tree/develop.svg?style=svg)](https://circleci.com/gh/ernestio/ernest-versioner/tree/develop)_
 
-This software intends to be an automation on the ernest release process. 
+This software intends to be an automation on the ernest release process.
 It will follow the next steps in order to completely release ernest.
 
 - [x] For each repo will verify if develop and master branches have diverged
@@ -16,6 +16,21 @@ It will follow the next steps in order to completely release ernest.
 ```
 make deps && make install
 ```
+
+## Before running the versioner
+
+Before you run the versioner you must have all your issues tagged with the correct githubg label.
+
+In order to label all sprint issues before starting a release with zube.io, you should tag all issues on done column for the current sprint.
+This can easily be done through the [Issue manager](https://zube.io/ernestio/ernest/manager) you should filter issues by :
+
+  - [ ] Status : Done
+  - [ ] Sprint : Your current sprint
+
+Once you double check all shown issues are correct, on top of the list you'll find a button `Update Selected Cards`, click it and a windo will appear, now on the `Add Labels` selection box select the release number, and click on `Submit` button.
+
+Now if you go back to the Sprint view, you should see all in `Done` status issues have been flagged with the valid release number.
+
 
 ## Using versioner CLI
 
