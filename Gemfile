@@ -1,7 +1,6 @@
 # A sample Gemfile
 source 'https://rubygems.org'
 
-gem 'atlas'
 gem 'colorize'
 gem 'octokit'
 gem 'rubocop'
@@ -16,8 +15,8 @@ gem 'slack-ruby-bot'
 
 group :development, :test do
   gem 'foreman'
-  gem 'rake'
   gem 'pry'
+  gem 'rake'
 end
 
 group :test do

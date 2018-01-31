@@ -9,7 +9,6 @@ It will follow the next steps in order to completely release ernest.
 - [x] For each repo will merge develop on master and create a release tag
 - [x] Creates a github release on ernest-cli
 - [x] Uploads to docker-hub every single service
-- [x] Generates vagrant package and uploads it to atlas
 
 ## Installation
 
@@ -57,12 +56,11 @@ Additionally in case you want to skip some of the inline questions you can defin
 - *GITHUB_TOKEN* : In order to merge develop in master, push, create tags...
 - *CI_TOKEN* : In order to check the build status of each repository.
 - *SLACK_WEBHOOK_URL* : In case you want slack to be notifying each release step
-- *ATLAS_TOKEN* : In order to upload packaged vagrant boxes
 
 So the command will look like:
 
 ```
-$ GITHUB_TOKEN=my_token SLACK_WEBHOOK_URL=url ATLAS_TOKEN=token ruby versioner.rb version 0.0.1 ernest-repositories-list.txt
+$ GITHUB_TOKEN=my_token SLACK_WEBHOOK_URL=url ruby versioner.rb version 0.0.1 ernest-repositories-list.txt
 ```
 
 ## Using versioner Slack

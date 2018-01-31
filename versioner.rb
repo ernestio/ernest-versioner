@@ -6,7 +6,6 @@ require 'thor'
 require 'colorize'
 require 'octokit'
 require 'slack-notifier'
-require 'atlas'
 require_relative 'lib/versioner'
 
 # CLI to release versions
@@ -32,12 +31,6 @@ class MyCLI < Thor
       @slack_url = ask 'Slack webhook URL : '
     end
     @slack = Slack::Notifier.new(@slack_url) unless @slack_url.empty?
-
-    @atlas_token = ENV['ATLAS_TOKEN']
-    @atlas_token = ask 'Provide your atlas token : ' if @atlas_token.nil?
-    Atlas.configure do |config|
-      config.access_token = @atlas_token
-    end
 
     puts 'In order to fully automate your release process we need you to provide some extra info'
     release_title = ask('Release title : ')
