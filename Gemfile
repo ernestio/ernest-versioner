@@ -1,7 +1,6 @@
 # A sample Gemfile
 source 'https://rubygems.org'
 
-gem 'atlas'
 gem 'colorize'
 gem 'octokit'
 gem 'rubocop'

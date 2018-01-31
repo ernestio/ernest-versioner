@@ -115,26 +115,10 @@ def docker_release(github, number, title, user, pass)
   e! 'rm -rf /tmp/ernest'
   e! 'cd /tmp && git clone git@github.com:ernestio/ernest.git'
   e! 'cd /tmp/ernest/ && git checkout develop'
-  e! "cd /tmp/ernest/ && composable release -L quay.io -O r3labs -v #{number} -U #{user} -p #{pass} definition.yml template.yml"
+  e! "cd /tmp/ernest/ && composable release -L quay.io -O ernest -v #{number} -U #{user} -p #{pass} definition.yml template.yml"
   e! "cd /tmp/ernest/ && git add docker-compose.yml docker-compose.enterprise.yml && git commit -m 'Bump version #{number}' && git push origin develop"
   e! "cd /tmp/ernest/ && git checkout master && git rebase develop && git tag -a #{number} -m 'Bump version #{number}' && git push origin master --tags"
 
   @notes = release_notes github, number
   github.create_release('ernestio/ernest', number, name: title, body: @notes)
-end
-
-# Release vagrant box on Atlas
-def vagrant_artifacts(number, title)
-  e! 'cd /tmp && git clone git@github.com:ernestio/ernest-vagrant.git'
-  e! 'cd /tmp/ernest-vagrant && git checkout develop'
-  e! 'cd /tmp/ernest-vagrant && berks vendor cookbooks'
-  e! 'cd /tmp/ernest-vagrant && vagrant up'
-  e! 'cd /tmp/ernest-vagrant && vagrant package'
-  e! 'cd /tmp/ernest-vagrant && vagrant destroy -f'
-
-  box = Atlas::Box.find('R3Labs/ernest')
-  version = box.create_version(version: number, description: title)
-  provider = version.create_provider(name: 'virtualbox')
-  provider.upload(File.open('/tmp/ernest-vagrant/package.box'))
-  version.release
 end
