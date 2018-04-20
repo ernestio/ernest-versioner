@@ -96,9 +96,9 @@ def release_cli(github, number, title)
   github.create_release('ernestio/ernest-cli', number, name: title, body: "Bump version #{number}")
   path = "#{ENV['GOPATH']}/src/github.com/ernestio/"
   e! "rm -rf #{path}ernest-cli && cd #{path}"
-  e! "cd #{path}  && git clone git@github.com:ernestio/ernest-cli"
+  e! "cd #{path} && git clone git@github.com:ernestio/ernest-cli"
   e! 'go get github.com/aktau/github-release'
-  e! "cd #{path}ernest-cli/ && git checkout master && make dist"
+  e! "cd #{path}ernest-cli/ && git checkout master && make deps && make dist"
   ["ernest-#{number}-darwin-386.zip",
    "ernest-#{number}-darwin-amd64.zip",
    "ernest-#{number}-linux-386.zip",
