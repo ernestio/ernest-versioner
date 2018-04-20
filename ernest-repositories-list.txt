@@ -21,3 +21,4 @@ git@github.com:ernestio/config-store.git
 git@github.com:ernestio/ernest-cli.git
 git@github.com:ernestio/mfa.git
 git@github.com:ernestio/policy-store.git
+git@github.com:ernestio/compliance.git
